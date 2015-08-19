@@ -46,6 +46,10 @@ spl_autoload_register(__NAMESPACE__ . '\loadClass');
  */
 function bestKebabInit()
 {
+    if (!file_exists(get_stylesheet_directory() . '/App/Controller')) {
+        return;
+    }
+
     $directory = new DirectoryIterator(get_stylesheet_directory() . '/App/Controller');
 
     foreach ($directory as $controller) {
