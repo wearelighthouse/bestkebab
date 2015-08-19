@@ -4,11 +4,11 @@
         "webdevstudios/cmb2": "dev-master"
     },
     "autoload": {
-        "files": ["vendor/cmb2/init.php"]
-    },
-    "extra": {
-        "installer-paths": {
-            "vendor/{$name}/": ["webdevstudios/cmb2"]
-        }
+        "psr-4": {
+            "BestKebab\\": "src"
+        },
+        "files": [
+            "vendor/webdevstudios/cmb2/init.php"
+        ]
     }
 }

@@ -8,11 +8,13 @@ if (!defined('ABSPATH')) {
 
 use BestKebab\Utility\Inflector as Inflector;
 
-class PostType
+abstract class PostType
 {
     protected $_class = '';
     protected $_name = '';
     protected $_plural = '';
+
+    protected $_metaBoxes = [];
 
     /**
      * @return void
@@ -26,18 +28,62 @@ class PostType
         if (!in_array($this->_name, get_post_types())) {
             $this->_registerPostType();
         }
+
+        // $this->initialise();
+        add_action('cmb2_init', [$this, 'initialise']);
     }
 
     /**
-     * Apply args array to the global WP_Query object
-     *
-     * @param array $args The arguments array for WP_Query
      * @return void
      */
-    public function query(array $args)
+    abstract public function initialise();
+
+    /**
+     * Adds a field to a meta box
+     *
+     * @param string $metaBoxTitle The title of the meta box
+     * @return void
+     */
+    public function addField($id, $type, $metaBoxId, $options = [])
+    {
+        $prefix = '_' . $this->_name . '_';
+        $this->_metaBoxes[$metaBoxId]->add_field([
+            'name' => __($name),
+            'id' => $prefix . $id,
+            'type' => $type
+        ] + $options);
+    }
+
+    /**
+     * Adds a meta box to the meta boxes array
+     *
+     * @param string $id A unique identifier for the meta box
+     * @param string $title The title of the meta box
+     * @param array $options The extra options array
+     * @return void
+     */
+    public function addMetaBox($id, $title, $options = [])
+    {
+        $metaBox = \new_cmb2_box([
+            'id' => $id,
+            'title' => __($title),
+            'object_types' => [
+                $this->_name
+            ]
+        ] + $options);
+        $this->_metaBoxes[$id] = $metaBox;
+    }
+
+    /**
+     * Apply options to the global WP_Query object
+     *
+     * @param array $options The options array for WP_Query
+     * @return void
+     */
+    public function query(array $options)
     {
         global $wp_query;
-        $wp_query = new \WP_Query($args);
+        $wp_query = new \WP_Query($options);
     }
 
     /**
