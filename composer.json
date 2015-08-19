@@ -1,0 +1,14 @@
+{
+    "require": {
+        "php": ">=5.4.16",
+        "webdevstudios/cmb2": "dev-master"
+    },
+    "autoload": {
+        "files": ["vendor/cmb2/init.php"]
+    },
+    "extra": {
+        "installer-paths": {
+            "vendor/{$name}/": ["webdevstudios/cmb2"]
+        }
+    }
+}
