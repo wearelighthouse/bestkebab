@@ -80,10 +80,11 @@ abstract class PostType
      *
      * @param string $name The undercored name of the taxonomy
      * @param string $type Either "category" or "tag"
+     * @return void
      */
-    public function addTaxonomy($name, $type)
+    public function addTaxonomy($name, $type, $options = [])
     {
-        $taxonomy = new Taxonomy($name, $type, $this->_name);
+        $taxonomy = new Taxonomy($name, $type, $this->_name, $options);
         $this->_taxonomies[$name] = $taxonomy;
     }
 

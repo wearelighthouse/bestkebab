@@ -20,7 +20,7 @@ class Taxonomy
     /**
      * @return void
      */
-    public function __construct($name, $type, $postType)
+    public function __construct($name, $type, $postType, array $options)
     {
         $this->_name = $name;
         $this->_postType = $postType;
@@ -30,16 +30,16 @@ class Taxonomy
         $this->_isHierarchical = $type === 'category';
 
         if (!in_array($this->_name, get_taxonomies())) {
-            $this->_registerTaxonomy();
+            $this->_registerTaxonomy($options);
         }
     }
 
     /**
      * @return void
      */
-    private function _registerTaxonomy()
+    private function _registerTaxonomy(array $options)
     {
-        register_taxonomy($this->_name, [$this->_postType], [
+        $defaults = [
             'labels' => [
                 'name' => __($this->_plural),
                 'singular_name' => __($this->_singular),
@@ -65,7 +65,8 @@ class Taxonomy
             'rewrite' => [
                 'slug' => Inflector::slugify($this->_plural)
             ],
-        ]);
+        ];
+        register_taxonomy($this->_name, [$this->_postType], wp_parse_args($options, $defaults));
         flush_rewrite_rules();
     }
 }
