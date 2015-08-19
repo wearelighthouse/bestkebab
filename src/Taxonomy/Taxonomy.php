@@ -8,23 +8,27 @@ if (!defined('ABSPATH')) {
 
 use BestKebab\Utility\Inflector as Inflector;
 
-abstract class Taxonomy
+class Taxonomy
 {
     protected $_name = '';
     protected $_plural = '';
     protected $_postType = '';
     protected $_singular = '';
 
+    protected $_isHierarchical;
+
     /**
      * @return void
      */
-    public function __construct($name, $postType)
+    public function __construct($name, $type, $postType)
     {
         $this->_name = $name;
         $this->_postType = $postType;
         $this->_singular = Inflector::humanize($this->_name);
         $this->_plural = Inflector::pluralize($this->_singular);
         
+        $this->_isHierarchical = $type === 'category';
+
         if (!in_array($this->_name, get_taxonomies())) {
             $this->_registerTaxonomy();
         }
@@ -33,7 +37,7 @@ abstract class Taxonomy
     /**
      * @return void
      */
-    private function _registerPostType()
+    private function _registerTaxonomy()
     {
         register_taxonomy($this->_name, [$this->_postType], [
             'labels' => [

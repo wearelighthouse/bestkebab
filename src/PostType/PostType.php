@@ -6,7 +6,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use BestKebab\Utility\Inflector as Inflector;
+use BestKebab\taxonomy\Taxonomy;
+use BestKebab\Utility\Inflector;
 
 abstract class PostType
 {
@@ -15,6 +16,7 @@ abstract class PostType
     protected $_plural = '';
 
     protected $_metaBoxes = [];
+    protected $_taxonomies = [];
 
     /**
      * @return void
@@ -71,6 +73,18 @@ abstract class PostType
             ]
         ] + $options);
         $this->_metaBoxes[$id] = $metaBox;
+    }
+
+    /**
+     * Adds a taxonomy to this post type
+     *
+     * @param string $name The undercored name of the taxonomy
+     * @param string $type Either "category" or "tag"
+     */
+    public function addTaxonomy($name, $type)
+    {
+        $taxonomy = new Taxonomy($name, $type, $this->_name);
+        $this->_taxonomies[$name] = $taxonomy;
     }
 
     /**

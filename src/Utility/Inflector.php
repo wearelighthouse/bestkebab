@@ -203,7 +203,7 @@ class Inflector
 
         $map = [
             '/[^\s\p{Zs}\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]/mu' => ' ',
-            '/[\s\p{Zs}]+/mu' => $replacement,
+            '/[\s\p{Zs}]+/mu' => '-',
             sprintf('/^[%s]+|[%s]+$/', $quotedReplacement, $quotedReplacement) => '',
         ];
 
