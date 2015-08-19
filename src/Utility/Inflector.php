@@ -83,14 +83,52 @@ class Inflector
         'information',
         'equipment'
     ];
+
+    /**
+     * Performs a serious of inflections on a string
+     *
+     * @param string $string The string to inflect
+     * @param array $functions The array of function names
+     * @return string
+     */
+    public static function batch($string, array $functions)
+    {
+        foreach ($functions as $function) {
+            $string = self::$function($string);
+        }
+        return $string;
+    }
+
+    /**
+     * Returns the class from a class with namespace
+     *
+     * @param string $string The string to classify
+     * @return string
+     */
+    public static function classify($string)
+    {
+        $string = explode('\\', $string);
+        return end($string);
+    }
+
+    /**
+     * Returns the input CamelCase as 'Camel Case'.
+     *
+     * @param string $string String to be humanized
+     * @return string
+     */
+    public static function humanize($string)
+    {
+        return ucwords(str_replace('_', ' ', $string));
+    }
     
     /**
      * Returns the plural inflection of a string
      *
-     * @param string $string The string to pluralise
+     * @param string $string The string to pluralize
      * @return string
      */
-    public static function pluralise($string)
+    public static function pluralize($string)
     {
         if (in_array(strtolower($string), self::$_uncountable)) {
             return $string;
@@ -112,18 +150,6 @@ class Inflector
         
         return $string;
     }
-
-    /**
-     * Returns the class from a class with namespace
-     *
-     * @param string $string The string to classify
-     * @return string
-     */
-    public static function classify($string)
-    {
-        $string = explode('\\', $string);
-        return end($string);
-    }
     
     /**
      * Returns the post type of a given controller class
@@ -133,16 +159,16 @@ class Inflector
      */
     public static function postTypify($string)
     {
-        return ucfirst(static::singularise(str_replace('Controller', '', static::classify($string))));
+        return ucfirst(static::singularize(str_replace('Controller', '', static::classify($string))));
     }
 
     /**
      * Returns the singular inflection of a string
      *
-     * @param string $string The string to sigularise
+     * @param string $string The string to sigularize
      * @return string
      */
-    public static function singularise($string)
+    public static function singularize($string)
     {
         if (in_array(strtolower($string), self::$_uncountable)) {
             return $string;
@@ -163,5 +189,36 @@ class Inflector
         }
         
         return $string;
+    }
+
+    /**
+     * Returns a string with all spaces converted to dashes
+     *
+     * @param string $string The string you want to slug
+     * @return string
+     */
+    public static function slugify($string)
+    {
+        $quotedReplacement = preg_quote('-', '/');
+
+        $map = [
+            '/[^\s\p{Zs}\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]/mu' => ' ',
+            '/[\s\p{Zs}]+/mu' => $replacement,
+            sprintf('/^[%s]+|[%s]+$/', $quotedReplacement, $quotedReplacement) => '',
+        ];
+
+        return strtolower(preg_replace(array_keys($map), array_values($map), $string));
+    }
+
+    /**
+     * Returns the input CamelCasedString as an underscored_string
+     *
+     * @param string $string The string to be underscored
+     * @return string
+     */
+    public static function underscore($string)
+    {
+        $string = str_replace('-', '_', $string);
+        return strtolower(preg_replace('/(?<=\\w)([A-Z])/', '_' . '\\1', $string));
     }
 }

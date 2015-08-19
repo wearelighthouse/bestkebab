@@ -23,13 +23,12 @@ abstract class PostType
     {
         $this->_class = Inflector::classify(get_class($this));
         $this->_name = strtolower($this->_class);
-        $this->_plural = ucfirst(Inflector::pluralise($this->_class));
+        $this->_plural = Inflector::batch($this->_class, ['humanize', 'pluralize']);
         
         if (!in_array($this->_name, get_post_types())) {
             $this->_registerPostType();
         }
 
-        // $this->initialise();
         add_action('cmb2_init', [$this, 'initialise']);
     }
 
@@ -44,7 +43,7 @@ abstract class PostType
      * @param string $metaBoxTitle The title of the meta box
      * @return void
      */
-    public function addField($id, $type, $metaBoxId, $options = [])
+    public function addField($id, $type, $name, $metaBoxId, $options = [])
     {
         $prefix = '_' . $this->_name . '_';
         $this->_metaBoxes[$metaBoxId]->add_field([
@@ -98,13 +97,13 @@ abstract class PostType
                 'all_items' => __('All ' . $this->_plural),
                 'add_new' => __('Add New'),
                 'add_new_item' => __('Add New ' . $this->_class),
-                'edit' => __('Edit'),
                 'edit_item' => __('Edit ' . $this->_class),
                 'new_item' => __('New ' . $this->_class),
                 'view_item' => __('View ' . $this->_class),
                 'search_items' => __('Search ' . $this->_plural),
                 'not_found' => __('Nothing found in the Database.'),
-                'not_found_in_trash' => __('Nothing found in Trash')
+                'not_found_in_trash' => __('Nothing found in Trash'),
+                'parent_item_colon' => __('Parent ' . $this->_class . ':')
             ],
             'public' => true,
             'publicly_queryable' => true,
@@ -125,7 +124,6 @@ abstract class PostType
                 'thumbnail'
             ]
         ]);
-
         flush_rewrite_rules();
     }
 }

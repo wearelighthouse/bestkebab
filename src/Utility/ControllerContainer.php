@@ -51,7 +51,7 @@ class ControllerContainer
     public function addController($controller)
     {
         $controller = basename($controller, '.php');
-        $postType = strtolower(Inflector::singularise(str_replace('Controller', '', $controller)));
+        $postType = Inflector::postTypify($controller);
         $ControllerClass = 'App\Controller\\' . $controller;
         $this->_controllers[$postType] = new $ControllerClass();
     }
