@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use BestKebab\taxonomy\Taxonomy;
+use BestKebab\Taxonomy\Taxonomy;
 use BestKebab\Utility\Inflector;
 
 abstract class PostType
