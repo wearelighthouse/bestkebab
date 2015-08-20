@@ -58,13 +58,11 @@ class Taxonomy
                 'choose_from_most_used' => __('Choose from the most used ' . $this->_plural),
                 'not_found' => __('No ' . $this->_plural . ' found')
             ],
-            'public' => true,
-            'show_admin_column' => true,
             'hierarchical' => $this->_isHierarchical,
             'query_var' => true,
             'rewrite' => [
                 'slug' => Inflector::slugify($this->_plural)
-            ],
+            ]
         ];
         register_taxonomy($this->_name, [$this->_postType], wp_parse_args($options, $defaults));
         flush_rewrite_rules();

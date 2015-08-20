@@ -42,15 +42,18 @@ abstract class PostType
     /**
      * Adds a field to a meta box
      *
-     * @param string $metaBoxTitle The title of the meta box
+     * @param string $id The id for this field
+     * @param string $type The type of the field
+     * @param string $name The name of the field
+     * @param string $metaBoxId The id of the meta box to add a field to
+     * @param array $options Any extra options
      * @return void
      */
     public function addField($id, $type, $name, $metaBoxId, $options = [])
     {
-        $prefix = '_' . $this->_name . '_';
         $this->_metaBoxes[$metaBoxId]->add_field([
+            'id' => '_' . $this->_name . '_' . $id,
             'name' => __($name),
-            'id' => $prefix . $id,
             'type' => $type
         ] + $options);
     }
@@ -65,14 +68,25 @@ abstract class PostType
      */
     public function addMetaBox($id, $title, $options = [])
     {
-        $metaBox = \new_cmb2_box([
-            'id' => $id,
+        $metaBox = new_cmb2_box([
+            'id' => '_' . $this->_name . '_' . $id . '_meta_box',
             'title' => __($title),
             'object_types' => [
                 $this->_name
             ]
         ] + $options);
         $this->_metaBoxes[$id] = $metaBox;
+    }
+
+    /**
+     * Adds support to this post type
+     *
+     * @param string|array $support The support to add
+     * @return void
+     */
+    public function addSupport($support)
+    {
+        add_post_type_support($this->_name, $support);
     }
 
     /**
@@ -86,6 +100,16 @@ abstract class PostType
     {
         $taxonomy = new Taxonomy($name, $type, $this->_name, $options);
         $this->_taxonomies[$name] = $taxonomy;
+    }
+
+    /**
+     * Returns the post types name
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return $this->_name;
     }
 
     /**
@@ -132,12 +156,7 @@ abstract class PostType
             ],
             'has_archive' => true,
             'capability_type' => 'post',
-            'hierarchical' => false,
-            'supports' => [
-                'title',
-                'editor',
-                'thumbnail'
-            ]
+            'hierarchical' => false
         ]);
         flush_rewrite_rules();
     }
