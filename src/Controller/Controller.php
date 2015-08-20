@@ -19,7 +19,7 @@ class Controller
     public function __construct()
     {
         $this->_postType = Inflector::postTypify(get_class($this));
-        $PostType = 'App\PostType\\' . $this->_postType;
+        $PostType = SITENAME . '\PostType\\' . $this->_postType;
 
         $this->{$this->_postType} = new $PostType();
         $this->initialise();

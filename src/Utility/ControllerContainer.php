@@ -52,7 +52,7 @@ class ControllerContainer
     {
         $controller = basename($controller, '.php');
         $postType = Inflector::postTypify($controller);
-        $ControllerClass = 'App\Controller\\' . $controller;
+        $ControllerClass = SITENAME . '\Controller\\' . $controller;
         $this->_controllers[$postType] = new $ControllerClass();
     }
 

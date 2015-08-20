@@ -25,13 +25,15 @@ function pr($var)
  */
 function loadClass($class)
 {
-    if (stripos($class, 'App') !== false) {
+    if (stripos($class, SITENAME) !== false && stripos($class, SITENAME) === 0) {
         $parts = explode('\\', $class);
         $file = array_pop($parts) . '.php';
-        $path = '';
+
+        array_shift($parts);
+        $path = 'src' . DS;
 
         foreach ($parts as $part) {
-            $path .= $part . '/';
+            $path .= $part . DS;
         }
 
         require $path . $file;
@@ -46,11 +48,11 @@ spl_autoload_register(__NAMESPACE__ . '\loadClass');
  */
 function bestKebabInit()
 {
-    if (!file_exists(get_stylesheet_directory() . '/App/Controller')) {
+    if (!file_exists(get_stylesheet_directory() . DS . 'src' . DS . 'Controller')) {
         return;
     }
 
-    $directory = new DirectoryIterator(get_stylesheet_directory() . '/App/Controller');
+    $directory = new DirectoryIterator(get_stylesheet_directory() . DS . 'src' . DS . 'Controller');
 
     foreach ($directory as $controller) {
         if (!$controller->isDot()) {
