@@ -10,12 +10,12 @@ use BestKebab\Utility\Inflector as Inflector;
 
 class Taxonomy
 {
-    protected $_name = '';
-    protected $_plural = '';
-    protected $_postType = '';
-    protected $_singular = '';
+    private $_name = '';
+    private $_plural = '';
+    private $_postType = '';
+    private $_singular = '';
 
-    protected $_isHierarchical;
+    private $_isHierarchical;
 
     /**
      * @return void
@@ -32,6 +32,18 @@ class Taxonomy
         if (!in_array($this->_name, get_taxonomies())) {
             $this->_registerTaxonomy($options);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if (!isset($this->{'_' . $name})) {
+            trigger_error('Call to undefined method ' . get_class($this) . '::' . $name . '()', E_USER_ERROR);
+        }
+        
+        return $this->{'_' . $name};
     }
 
     /**

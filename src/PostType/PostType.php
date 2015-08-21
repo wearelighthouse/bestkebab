@@ -9,11 +9,14 @@ if (!defined('ABSPATH')) {
 use BestKebab\PostType\Taxonomy\Taxonomy;
 use BestKebab\Utility\Inflector;
 
+use WP_POST;
+
 abstract class PostType
 {
     private $_model = '';
     private $_name = '';
 
+    private $_fields = [];
     private $_metaBoxes = [];
     private $_taxonomies = [];
 
@@ -113,6 +116,33 @@ abstract class PostType
     {
         $taxonomy = new Taxonomy($name, $type, $this->_name, $options);
         $this->_taxonomies[$name] = $taxonomy;
+    }
+
+    /**
+     * Prepares an entity
+     *
+     * @param \WP_POST $post The post object
+     * @return void
+     */
+    public function prepareEntity(WP_POST $post)
+    {
+        foreach ($this->_metaBoxes as $metaBox) {
+            foreach ($metaBox->prop('fields') as $field) {
+                $postMeta = get_post_meta($post->ID, $field['id'], true);
+
+                if (!empty($postMeta)) {
+                    $post->{str_replace('_' . $this->_name . '_', '', $field['id'])} = $postMeta;
+                }
+            }
+        }
+
+        foreach ($this->_taxonomies as $taxonomy) {
+            $terms = get_the_terms($post->ID, $taxonomy->name());
+
+            if (!empty($terms)) {
+                $post->{Inflector::pluralize($taxonomy->name())} = $terms;
+            }
+        }
     }
 
     /**

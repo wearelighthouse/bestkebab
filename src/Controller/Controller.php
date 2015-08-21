@@ -8,6 +8,8 @@ if (!defined('ABSPATH')) {
 
 use BestKebab\Utility\Inflector as Inflector;
 
+use WP_POST;
+
 class Controller
 {
 
@@ -32,22 +34,11 @@ class Controller
     }
 
     /**
-     * Display archive part for post type
-     *
+     * @param \WP_POST $post The post object
      * @return void
      */
-    public function archive()
+    public function beforeRender(WP_POST $post)
     {
-        include 'src' . DS . 'Part' . DS . $this->{$this->_postType}->model() . DS . 'archive.php';
-    }
-
-    /**
-     * Display single part for post type
-     *
-     * @return void
-     */
-    public function single()
-    {
-        include 'src' . DS . 'Part' . DS . $this->{$this->_postType}->model() . DS . 'single.php';
+        $this->{$this->_postType}->prepareEntity($post);
     }
 }

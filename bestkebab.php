@@ -68,17 +68,6 @@ add_action('init', 'bestKebabInit');
  */
 function bestKebab()
 {
-    global $post, $wp_query;
-
-    if (!isset($post)) {
-        $postType = 'post';
-    } else {
-        $postType = $post->post_type;
-    }
-
-    if ($postType === 'page' || isset($wp_query->query_vars[$postType])) {
-        BestKebab\Utility\ControllerContainer::instance()->getController($postType)->single();
-    } else {
-        BestKebab\Utility\ControllerContainer::instance()->getController($postType)->archive();
-    }
+    global $post;
+    BestKebab\Utility\ControllerContainer::instance()->getController($post->post_type)->beforeRender($post);
 }
