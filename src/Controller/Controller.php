@@ -34,6 +34,8 @@ class Controller
     }
 
     /**
+     * This is called before each iteration of "The Loop"
+     *
      * @param \WP_POST $post The post object
      * @return void
      */
