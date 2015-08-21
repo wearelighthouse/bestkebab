@@ -40,7 +40,7 @@ function loadClass($class)
     }
 }
 
-set_include_path(get_include_path() . ':' . get_stylesheet_directory());
+set_include_path(get_include_path() . ':' . THEME);
 spl_autoload_register(__NAMESPACE__ . '\loadClass');
 
 /**
@@ -48,11 +48,11 @@ spl_autoload_register(__NAMESPACE__ . '\loadClass');
  */
 function bestKebabInit()
 {
-    if (!file_exists(get_stylesheet_directory() . DS . 'src' . DS . 'Controller')) {
+    if (!file_exists(THEME . DS . 'src' . DS . 'Controller')) {
         return;
     }
 
-    $directory = new DirectoryIterator(get_stylesheet_directory() . DS . 'src' . DS . 'Controller');
+    $directory = new DirectoryIterator(THEME . DS . 'src' . DS . 'Controller');
 
     foreach ($directory as $controller) {
         if (!$controller->isDot()) {

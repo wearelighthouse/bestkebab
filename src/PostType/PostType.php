@@ -6,32 +6,45 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use BestKebab\Taxonomy\Taxonomy;
+use BestKebab\PostType\Taxonomy\Taxonomy;
 use BestKebab\Utility\Inflector;
 
 abstract class PostType
 {
-    protected $_class = '';
-    protected $_name = '';
-    protected $_plural = '';
+    private $_model = '';
+    private $_name = '';
 
-    protected $_metaBoxes = [];
-    protected $_taxonomies = [];
+    private $_metaBoxes = [];
+    private $_taxonomies = [];
 
     /**
      * @return void
      */
     public function __construct()
     {
-        $this->_class = Inflector::classify(get_class($this));
-        $this->_name = strtolower($this->_class);
-        $this->_plural = Inflector::batch($this->_class, ['humanize', 'pluralize']);
+        $this->_model = Inflector::batch(basename(get_class($this), 'PostType'), [
+            'classify',
+            'singularize'
+        ]);
+        $this->_name = strtolower($this->_model);
         
         if (!in_array($this->_name, get_post_types())) {
             $this->_registerPostType();
         }
 
         add_action('cmb2_init', [$this, 'initialise']);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if (!isset($this->{'_' . $name})) {
+            trigger_error('Call to undefined method ' . get_class($this) . '::' . $name . '()', E_USER_ERROR);
+        }
+        
+        return $this->{'_' . $name};
     }
 
     /**
@@ -103,16 +116,6 @@ abstract class PostType
     }
 
     /**
-     * Returns the post types name
-     *
-     * @return string
-     */
-    public function name()
-    {
-        return $this->_name;
-    }
-
-    /**
      * Apply options to the global WP_Query object
      *
      * @param array $options The options array for WP_Query
@@ -129,20 +132,21 @@ abstract class PostType
      */
     private function _registerPostType()
     {
+        $plural = Inflector::pluralize($this->_model);
         register_post_type($this->_name, [
             'labels' => [
-                'name' => __($this->_plural),
-                'singular_name' => __($this->_class),
-                'all_items' => __('All ' . $this->_plural),
+                'name' => __($plural),
+                'singular_name' => __($this->_model),
+                'all_items' => __('All ' . $plural),
                 'add_new' => __('Add New'),
-                'add_new_item' => __('Add New ' . $this->_class),
-                'edit_item' => __('Edit ' . $this->_class),
-                'new_item' => __('New ' . $this->_class),
-                'view_item' => __('View ' . $this->_class),
-                'search_items' => __('Search ' . $this->_plural),
+                'add_new_item' => __('Add New ' . $this->_model),
+                'edit_item' => __('Edit ' . $this->_model),
+                'new_item' => __('New ' . $this->_model),
+                'view_item' => __('View ' . $this->_model),
+                'search_items' => __('Search ' . $plural),
                 'not_found' => __('Nothing found in the Database.'),
                 'not_found_in_trash' => __('Nothing found in Trash'),
-                'parent_item_colon' => __('Parent ' . $this->_class . ':')
+                'parent_item_colon' => __('Parent ' . $this->_model . ':')
             ],
             'public' => true,
             'publicly_queryable' => true,
@@ -151,7 +155,7 @@ abstract class PostType
             'query_var' => true,
             'menu_position' => 4,
             'rewrite' => [
-                'slug' => strtolower($this->_plural),
+                'slug' => strtolower($plural),
                 'with_front' => false
             ],
             'has_archive' => true,

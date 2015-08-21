@@ -1,6 +1,6 @@
 <?php
 
-namespace BestKebab\Taxonomy;
+namespace BestKebab\PostType\Taxonomy;
 
 if (!defined('ABSPATH')) {
     exit;

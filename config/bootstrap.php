@@ -4,13 +4,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-if (file_exists(get_stylesheet_directory() . '/config/app.php')) {
-    require get_stylesheet_directory() . '/config/app.php';
-} else {
-    if (!defined('SITENAME')) {
-        define('SITENAME', 'App');
-    }
+require __DIR__ . '/paths.php';
+
+if (file_exists(THEME . DS . 'config' . DS . 'app.php')) {
+    require THEME . DS . 'config' . DS . 'app.php';
 }
 
-require __DIR__ . '/paths.php';
+if (!defined('SITENAME')) {
+    define('SITENAME', 'App');
+}
+
 require PLUGIN . DS . 'vendor' . DS . 'autoload.php';

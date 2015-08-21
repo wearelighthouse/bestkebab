@@ -18,9 +18,8 @@ class Controller
      */
     public function __construct()
     {
-        $this->_postType = Inflector::postTypify(get_class($this));
-        $PostType = SITENAME . '\PostType\\' . $this->_postType;
-
+        $this->_postType = Inflector::classify(basename(get_class($this), 'Controller'));
+        $PostType = SITENAME . '\PostType\\' . $this->_postType . 'PostType';
         $this->{$this->_postType} = new $PostType();
         $this->initialise();
     }
@@ -39,7 +38,7 @@ class Controller
      */
     public function archive()
     {
-        include 'App/Part/' . $this->{$this->_postType}->name() . '/archive.php';
+        include 'src' . DS . 'Part' . DS . $this->{$this->_postType}->model() . DS . 'archive.php';
     }
 
     /**
@@ -49,6 +48,6 @@ class Controller
      */
     public function single()
     {
-        include 'App/Part/' . $this->{$this->_postType}->name() . '/single.php';
+        include 'src' . DS . 'Part' . DS . $this->{$this->_postType}->model() . DS . 'single.php';
     }
 }

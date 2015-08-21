@@ -150,17 +150,6 @@ class Inflector
         
         return $string;
     }
-    
-    /**
-     * Returns the post type of a given controller class
-     *
-     * @param string $string The controller class
-     * @return string
-     */
-    public static function postTypify($string)
-    {
-        return ucfirst(static::singularize(str_replace('Controller', '', static::classify($string))));
-    }
 
     /**
      * Returns the singular inflection of a string
