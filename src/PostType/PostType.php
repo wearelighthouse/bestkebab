@@ -129,7 +129,7 @@ abstract class PostType
         if (post_type_supports($this->_name, 'thumbnail') && has_post_thumbnail($post->ID)) {
             $post->thumbnail_id = get_post_thumbnail_id($post->ID);
         }
-        
+
         foreach ($this->_metaBoxes as $metaBox) {
             foreach ($metaBox->prop('fields') as $field) {
                 $postMeta = get_post_meta($post->ID, $field['id'], true);
@@ -144,9 +144,16 @@ abstract class PostType
             $terms = get_the_terms($post->ID, $taxonomy->name());
 
             if (!empty($terms)) {
+                if ($taxonomy->isHierarchical()) {
+                    $terms = $this->_formatTerms($terms);
+                    pr($terms);
+                }
+
                 $post->{Inflector::pluralize($taxonomy->name())} = $terms;
             }
         }
+
+        die;
     }
 
     /**
@@ -159,6 +166,33 @@ abstract class PostType
     {
         global $wp_query;
         $wp_query = new \WP_Query($options);
+    }
+
+    /**
+     * Formats an array of terms to be correctly associated
+     * with its parent
+     *
+     * @param array $terms The terms array
+     * @return array
+     */
+    private function _formatTerms(array $terms)
+    {
+        $formated = [];
+        foreach ($terms as $term) {
+            if ($term->parent === 0) {
+                $children = isset($formated[$term->term_id]) ? $formated[$term->term_id]->children : [];
+                $formated[$term->term_id] = $term;
+                $formated[$term->term_id]->children = $children;
+            } else {
+                if (!isset($formated[$term->parent])) {
+                    $formated[$term->parent] = new \stdClass();
+                    $formated[$term->parent]->children = [$term];
+                } else {
+                    $formated[$term->parent]->children[] = $term;
+                }
+            }
+        }
+        return $formated;
     }
 
     /**
