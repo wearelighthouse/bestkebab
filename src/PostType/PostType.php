@@ -126,6 +126,10 @@ abstract class PostType
      */
     public function prepareEntity(WP_POST $post)
     {
+        if (post_type_supports($this->_name, 'thumbnail') && has_post_thumbnail($post->ID)) {
+            $post->thumbnail_id = get_post_thumbnail_id($post->ID);
+        }
+        
         foreach ($this->_metaBoxes as $metaBox) {
             foreach ($metaBox->prop('fields') as $field) {
                 $postMeta = get_post_meta($post->ID, $field['id'], true);
