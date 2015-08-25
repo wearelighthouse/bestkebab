@@ -140,6 +140,8 @@ abstract class PostType
      */
     public function prepareEntity(WP_POST $post)
     {
+        $post->prefix = $this->_prefix;
+
         if (post_type_supports($this->_name, 'thumbnail') && has_post_thumbnail($post->ID)) {
             $post->thumbnail_id = get_post_thumbnail_id($post->ID);
         }
