@@ -36,6 +36,7 @@ abstract class PostType
         }
 
         add_action('cmb2_init', [$this, 'initialise']);
+        add_action('save_post_' . $this->_name, [$this, 'afterSave'], 10, 3);
     }
 
     /**
@@ -49,11 +50,6 @@ abstract class PostType
         
         return $this->{'_' . $name};
     }
-
-    /**
-     * @return void
-     */
-    abstract public function initialise();
 
     /**
      * Adds a field to a meta box
@@ -95,6 +91,17 @@ abstract class PostType
     }
 
     /**
+     * Runs after post type is saved
+     * @param int $id The post id
+     * @param \WP_POST $post The post object
+     * @param bool $isUpdate If this is a create or update
+     * @return void
+     */
+    public function afterSave($id, WP_POST $post, $isUpdate)
+    {
+    }
+
+    /**
      * Adds support to this post type
      *
      * @param string|array $support The support to add
@@ -117,6 +124,11 @@ abstract class PostType
         $taxonomy = new Taxonomy($name, $type, $this->_name, $options);
         $this->_taxonomies[$name] = $taxonomy;
     }
+
+    /**
+     * @return void
+     */
+    abstract public function initialise();
 
     /**
      * Prepares an entity
