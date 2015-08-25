@@ -15,6 +15,7 @@ abstract class PostType
 {
     private $_model = '';
     private $_name = '';
+    private $_prefix = '';
 
     private $_fields = [];
     private $_metaBoxes = [];
@@ -30,6 +31,7 @@ abstract class PostType
             'singularize'
         ]);
         $this->_name = strtolower($this->_model);
+        $this->_prefix = '_' . $this->_name . '_';
         
         if (!in_array($this->_name, get_post_types())) {
             $this->_registerPostType();
@@ -64,7 +66,7 @@ abstract class PostType
     public function addField($id, $type, $name, $metaBoxId, $options = [])
     {
         $this->_metaBoxes[$metaBoxId]->add_field([
-            'id' => '_' . $this->_name . '_' . $id,
+            'id' => $this->_prefix . $id,
             'name' => __($name),
             'type' => $type
         ] + $options);
@@ -81,7 +83,7 @@ abstract class PostType
     public function addMetaBox($id, $title, $options = [])
     {
         $metaBox = new_cmb2_box([
-            'id' => '_' . $this->_name . '_' . $id . '_meta_box',
+            'id' => $this->_prefix . $id . '_meta_box',
             'title' => __($title),
             'object_types' => [
                 $this->_name
@@ -147,7 +149,7 @@ abstract class PostType
                 $postMeta = get_post_meta($post->ID, $field['id'], true);
 
                 if (!empty($postMeta)) {
-                    $post->{str_replace('_' . $this->_name . '_', '', $field['id'])} = $postMeta;
+                    $post->{str_replace($this->_prefix, '', $field['id'])} = $postMeta;
                 }
             }
         }
