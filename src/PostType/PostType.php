@@ -109,6 +109,20 @@ abstract class PostType
     }
 
     /**
+     * Add post meta to a given post
+     *
+     * @param int $id The post id
+     * @param string $metaKey The meta key
+     * @param mixed $metaValue The meta value
+     * @param bool $isUnique Whether or not you want the key to stay unique
+     * @return bool|int
+     */
+    public function addPostMeta($id, $metaKey, $metaValue, $isUnique = true)
+    {
+        return add_post_meta($id, $this->_prefix($metaKey), $metaValue, $isUnique);
+    }
+
+    /**
      * Runs after post type is saved
      * @param int $id The post id
      * @param \WP_POST $post The post object
@@ -144,23 +158,28 @@ abstract class PostType
     }
 
     /**
-     * Finds or creates unique post meta
+     * Returns post by a given id
      *
-     * @param int $postId The post id
-     * @param string $metaKey The meta key
-     * @param mixed $metaValue The meta value
-     * @return mixed The value of $metaValue
+     * @param int $id The id of the post
+     * @return WP_POST
      */
-    public function findOrCreatePostMeta($postId, $metaKey, $metaValue)
+    public function get($id)
     {
-        $postMeta = get_post_meta($postId, $metaKey, true);
+        $post = get_post($id);
+        return $this->prepareEntity($post);
+    }
 
-        if ($postMeta) {
-            return $postMeta;
-        }
-
-        add_post_meta($postId, $this->prefix() . $metaKey, $metaValue, true);
-        return $metaValue;
+    /**
+     * Get post meta of a given post
+     *
+     * @param int $id The post id
+     * @param string $metaKey The meta key
+     * @param bool $single Whether to return a single value
+     * @return mixed
+     */
+    public function getPostMeta($id, $metaKey, $single = true)
+    {
+        return get_post_meta($id, $this->_prefix($metaKey), $single);
     }
 
     /**
@@ -172,7 +191,7 @@ abstract class PostType
      * Prepares an entity
      *
      * @param \WP_POST $post The post object
-     * @return void
+     * @return \WP_POST
      */
     public function prepareEntity(WP_POST $post)
     {
@@ -184,7 +203,7 @@ abstract class PostType
 
         foreach ($this->_metaBoxes as $metaBox) {
             foreach ($metaBox->prop('fields') as $field) {
-                $postMeta = get_post_meta($post->ID, $field['id'], true);
+                $postMeta = $this->getPostMeta($post->ID, $field['id']);
 
                 if (!empty($postMeta)) {
                     $post->{str_replace($this->_prefix, '', $field['id'])} = $postMeta;
@@ -203,18 +222,21 @@ abstract class PostType
                 $post->{Inflector::pluralize($taxonomy->name())} = $terms;
             }
         }
+
+        return $post;
     }
 
     /**
-     * Apply options to the global WP_Query object
+     * Update post meta on a given post
      *
-     * @param array $options The options array for WP_Query
-     * @return void
+     * @param int $id The post id
+     * @param string $metaKey The meta key
+     * @param mixed $metaValue The meta value
+     * @return mixed
      */
-    public function query(array $options)
+    public function updatePostMeta($id, $metaKey, $metaValue)
     {
-        global $wp_query;
-        $wp_query = new \WP_Query($options);
+        return update_post_meta($id, $this->_prefix($metaKey), $metaValue);
     }
 
     /**
@@ -242,6 +264,24 @@ abstract class PostType
             }
         }
         return $formated;
+    }
+
+    /**
+     * Checks if a string has been prefixed and
+     * prefixes it if it hasn't
+     *
+     * @param string $string The string to check
+     * @return string
+     */
+    private function _prefix($string)
+    {
+        $hasPrefix = substr($string, 0, strlen($this->_prefix)) === $this->_prefix;
+
+        if ($hasPrefix) {
+            return $string;
+        }
+
+        return $this->_prefix . $string;
     }
 
     /**
