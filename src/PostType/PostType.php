@@ -65,6 +65,22 @@ abstract class PostType
      */
     public function addField($id, $type, $name, $metaBoxId, $options = [])
     {
+        if (substr($type, 0, strlen('taxonomy_')) === 'taxonomy_') {
+            $type = str_replace('taxonomy_', '', $type);
+
+            $terms = get_terms($options['taxonomy'], [
+                'hide_empty' => false
+            ]);
+
+            $options['options'] = [];
+
+            foreach ($terms as $term) {
+                $options['options'][$term->slug] = __($term->name);
+            }
+
+            unset($options['taxonomy']);
+        }
+
         $this->_metaBoxes[$metaBoxId]->add_field([
             'id' => $this->_prefix . $id,
             'name' => __($name),
@@ -125,6 +141,26 @@ abstract class PostType
     {
         $taxonomy = new Taxonomy($name, $type, $this->_name, $options);
         $this->_taxonomies[$name] = $taxonomy;
+    }
+
+    /**
+     * Finds or creates unique post meta
+     *
+     * @param int $postId The post id
+     * @param string $metaKey The meta key
+     * @param mixed $metaValue The meta value
+     * @return mixed The value of $metaValue
+     */
+    public function findOrCreatePostMeta($postId, $metaKey, $metaValue)
+    {
+        $postMeta = get_post_meta($postId, $metaKey, true);
+
+        if ($postMeta) {
+            return $postMeta;
+        }
+
+        add_post_meta($postId, $this->prefix() . $metaKey, $metaValue, true);
+        return $metaValue;
     }
 
     /**
