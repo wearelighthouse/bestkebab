@@ -146,14 +146,11 @@ abstract class PostType
             if (!empty($terms)) {
                 if ($taxonomy->isHierarchical()) {
                     $terms = $this->_formatTerms($terms);
-                    pr($terms);
                 }
 
                 $post->{Inflector::pluralize($taxonomy->name())} = $terms;
             }
         }
-
-        die;
     }
 
     /**
