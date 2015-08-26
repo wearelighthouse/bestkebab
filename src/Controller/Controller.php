@@ -6,7 +6,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use BestKebab\Utility\Inflector as Inflector;
+use BestKebab\Network\Request;
+use BestKebab\Utility\Inflector;
 
 use WP_POST;
 use WP_Query;
@@ -15,6 +16,7 @@ class Controller
 {
 
     private $_postType = '';
+    protected $request = null;
 
     /**
      * @return void
@@ -50,6 +52,13 @@ class Controller
      */
     public function beforeFilter(WP_Query $query)
     {
+        $this->request = new Request($query);
+
+        if ($query->is_archive) {
+            $this->archive();
+        } else {
+            $this->single();
+        }
     }
 
     /**
@@ -61,5 +70,19 @@ class Controller
     public function beforeRender(WP_POST $post)
     {
         $this->{$this->_postType}->prepareEntity($post);
+    }
+
+    /**
+     * @return void
+     */
+    public function archive()
+    {
+    }
+
+    /**
+     * @return void
+     */
+    public function single()
+    {
     }
 }
