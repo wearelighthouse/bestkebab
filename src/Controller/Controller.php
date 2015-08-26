@@ -26,11 +26,13 @@ class Controller
         $this->_postType = Inflector::classify(basename(get_class($this), 'Controller'));
         $PostType = SITENAME . '\PostType\\' . $this->_postType . 'PostType';
         $this->{$this->_postType} = new $PostType();
+
+        $this->request = new Request();
         $this->initialise();
 
         add_action('the_post', [$this, 'beforeRender'], 10, 1);
         add_action('pre_get_posts', function (WP_Query $query) {
-            if ($query->query['post_type'] === $this->{$this->_postType}->name()) {
+            if (isset($query->query['post_type']) && $query->query['post_type'] === $this->{$this->_postType}->name()) {
                 $this->beforeFilter($query);
             }
         }, 10, 1);
@@ -52,11 +54,11 @@ class Controller
      */
     public function beforeFilter(WP_Query $query)
     {
-        $this->request = new Request($query);
+        $this->request->wpQuery = $query;
 
         if ($query->is_archive) {
             $this->archive();
-        } else {
+        } elseif ($query->is_single) {
             $this->single();
         }
     }

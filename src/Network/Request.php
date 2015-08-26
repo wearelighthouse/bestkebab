@@ -18,10 +18,9 @@ class Request
     /**
      * @return void
      */
-    public function __construct(WP_Query $wpQuery)
+    public function __construct()
     {
         $this->data = $_POST;
         $this->query = $_GET;
-        $this->wpQuery = $wpQuery;
     }
 }
