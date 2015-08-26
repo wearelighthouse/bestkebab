@@ -19,6 +19,7 @@ abstract class PostType
 
     private $_fields = [];
     private $_metaBoxes = [];
+    private $_properties = [];
     private $_taxonomies = [];
 
     /**
@@ -86,6 +87,7 @@ abstract class PostType
             'name' => __($name),
             'type' => $type
         ] + $options);
+        $this->_addProperty($id, 'meta');
     }
 
     /**
@@ -119,6 +121,7 @@ abstract class PostType
      */
     public function addPostMeta($id, $metaKey, $metaValue, $isUnique = true)
     {
+        $this->_addProperty($metaKey, 'meta');
         return add_post_meta($id, $this->_prefix($metaKey), $metaValue, $isUnique);
     }
 
@@ -155,6 +158,7 @@ abstract class PostType
     {
         $taxonomy = new Taxonomy($name, $type, $this->_name, $options);
         $this->_taxonomies[$name] = $taxonomy;
+        $this->_addProperty($name, 'taxonomy');
     }
 
     /**
@@ -282,6 +286,16 @@ abstract class PostType
         }
 
         return $this->_prefix . $string;
+    }
+
+    /**
+     * Adds a field/taxonomy to the properties array
+     *
+     * @return void
+     */
+    private function _addProperty($name, $type)
+    {
+        $this->_properties[$name] = $type;
     }
 
     /**

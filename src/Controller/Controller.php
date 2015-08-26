@@ -54,7 +54,7 @@ class Controller
      */
     public function beforeFilter(WP_Query $query)
     {
-        $this->request->wpQuery = $query;
+        $this->request->wpQuery = &$query;
 
         if ($query->is_archive) {
             $this->archive();
