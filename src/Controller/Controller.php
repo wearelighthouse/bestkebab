@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 use BestKebab\Utility\Inflector as Inflector;
 
 use WP_POST;
+use WP_Query;
 
 class Controller
 {
@@ -24,12 +25,30 @@ class Controller
         $PostType = SITENAME . '\PostType\\' . $this->_postType . 'PostType';
         $this->{$this->_postType} = new $PostType();
         $this->initialise();
+
+        add_action('the_post', [$this, 'beforeRender'], 10, 1);
+        add_action('pre_get_posts', function (WP_Query $query) {
+            if ($query->query['post_type'] === $this->{$this->_postType}->name()) {
+                $this->beforeFilter($query);
+            }
+        }, 10, 1);
     }
 
     /**
      * @return void
      */
     public function initialise()
+    {
+    }
+
+    /**
+     * This is called after the global WP_Query object is setup for
+     * this controller
+     *
+     * @param \WP_Query $query The query object
+     * @return void
+     */
+    public function beforeFilter(WP_Query $query)
     {
     }
 
