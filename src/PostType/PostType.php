@@ -11,7 +11,7 @@ use BestKebab\Utility\Inflector;
 
 use WP_POST;
 
-abstract class PostType
+class PostType
 {
     private $_model = '';
     private $_name = '';
@@ -21,6 +21,8 @@ abstract class PostType
     private $_metaBoxes = [];
     private $_properties = [];
     private $_taxonomies = [];
+
+    protected $_defaults = [];
 
     /**
      * @return void
@@ -33,10 +35,37 @@ abstract class PostType
         ]);
         $this->_name = strtolower($this->_model);
         $this->_prefix = '_' . $this->_name . '_';
-        
-        if (!in_array($this->_name, get_post_types())) {
-            $this->_registerPostType();
-        }
+
+        $plural = Inflector::pluralize($this->_model);
+        $this->_defaults = [
+            'labels' => [
+                'name' => __($plural),
+                'singular_name' => __($this->_model),
+                'all_items' => __('All ' . $plural),
+                'add_new' => __('Add New'),
+                'add_new_item' => __('Add New ' . $this->_model),
+                'edit_item' => __('Edit ' . $this->_model),
+                'new_item' => __('New ' . $this->_model),
+                'view_item' => __('View ' . $this->_model),
+                'search_items' => __('Search ' . $plural),
+                'not_found' => __('Nothing found in the Database.'),
+                'not_found_in_trash' => __('Nothing found in Trash'),
+                'parent_item_colon' => __('Parent ' . $this->_model . ':')
+            ],
+            'public' => true,
+            'publicly_queryable' => true,
+            'exclude_from_search' => false,
+            'show_ui' => true,
+            'query_var' => true,
+            'menu_position' => 4,
+            'rewrite' => [
+                'slug' => strtolower($plural),
+                'with_front' => false
+            ],
+            'has_archive' => true,
+            'capability_type' => 'post',
+            'hierarchical' => false
+        ];
 
         add_action('cmb2_init', [$this, 'initialise']);
         add_action('save_post_' . $this->_name, [$this, 'afterSave'], 10, 3);
@@ -187,9 +216,18 @@ abstract class PostType
     }
 
     /**
+     * If this method is overloaded and you wish to change the defaults
+     * array when registering a custom post type the parent function must
+     * be called after.
+     *
      * @return void
      */
-    abstract public function initialise();
+    public function initialise()
+    {
+        if (!in_array($this->_name, get_post_types())) {
+            $this->_registerPostType();
+        }
+    }
 
     /**
      * Prepares an entity
@@ -228,6 +266,22 @@ abstract class PostType
         }
 
         return $post;
+    }
+
+    /**
+     * Updates the default argument array for registering a custom
+     * post type
+     *
+     * @param array $options The options array
+     * @return void
+     */
+    public function updateDefaults(array $options)
+    {
+        if (isset($options['labels'])) {
+            $options['labels'] = $this->_defaults['labels'];
+        }
+
+        $this->_defaults = wp_parse_args($options, $this->_defaults);
     }
 
     /**
@@ -303,36 +357,7 @@ abstract class PostType
      */
     private function _registerPostType()
     {
-        $plural = Inflector::pluralize($this->_model);
-        register_post_type($this->_name, [
-            'labels' => [
-                'name' => __($plural),
-                'singular_name' => __($this->_model),
-                'all_items' => __('All ' . $plural),
-                'add_new' => __('Add New'),
-                'add_new_item' => __('Add New ' . $this->_model),
-                'edit_item' => __('Edit ' . $this->_model),
-                'new_item' => __('New ' . $this->_model),
-                'view_item' => __('View ' . $this->_model),
-                'search_items' => __('Search ' . $plural),
-                'not_found' => __('Nothing found in the Database.'),
-                'not_found_in_trash' => __('Nothing found in Trash'),
-                'parent_item_colon' => __('Parent ' . $this->_model . ':')
-            ],
-            'public' => true,
-            'publicly_queryable' => true,
-            'exclude_from_search' => false,
-            'show_ui' => true,
-            'query_var' => true,
-            'menu_position' => 4,
-            'rewrite' => [
-                'slug' => strtolower($plural),
-                'with_front' => false
-            ],
-            'has_archive' => true,
-            'capability_type' => 'post',
-            'hierarchical' => false
-        ]);
+        register_post_type($this->_name, $this->_defaults);
         flush_rewrite_rules();
     }
 }
