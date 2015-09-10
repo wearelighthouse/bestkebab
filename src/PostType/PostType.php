@@ -68,7 +68,7 @@ class PostType
         ];
 
         add_action('cmb2_init', [$this, 'initialise']);
-        add_action('save_post_' . $this->_name, [$this, 'afterSave'], 10, 3);
+        add_action('save_post_' . $this->_name, [$this, 'afterSave'], 99, 3);
     }
 
     /**
