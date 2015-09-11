@@ -5,4 +5,7 @@ if (!defined('DS')) {
 }
 
 define('PLUGIN', dirname(__DIR__));
-define('THEME', get_stylesheet_directory());
+
+if (!defined('THEME')) {
+    define('THEME', get_stylesheet_directory());
+}
