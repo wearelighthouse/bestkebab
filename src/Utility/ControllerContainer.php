@@ -61,6 +61,14 @@ class ControllerContainer
     }
 
     /**
+     * @return array
+     */
+    public function controllers()
+    {
+        return $this->_controllers;
+    }
+
+    /**
      * @return \BestKebab\Controller\Controller
      */
     public function getController($postType)
