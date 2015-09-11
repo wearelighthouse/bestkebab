@@ -32,7 +32,9 @@ class Controller
 
         add_action('the_post', [$this, 'beforeRender'], 10, 1);
         add_action('pre_get_posts', function (WP_Query $query) {
-            if (isset($query->query['post_type']) && $query->query['post_type'] === $this->{$this->_postType}->name()) {
+            if ((!isset($query->query['beforeFilter']) || $query->query['beforeFilter']) &&
+                isset($query->query['post_type']) &&
+                $query->query['post_type'] === $this->{$this->_postType}->name()) {
                 $this->beforeFilter($query);
             }
         }, 10, 1);
