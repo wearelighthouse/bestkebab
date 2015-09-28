@@ -50,18 +50,4 @@ class ControllerTest extends WP_UnitTestCase
         $this->assertNotEquals($wp_query, $this->_controller->request->wpQuery);
     }
 
-    /**
-     * Tests beforeRender is run correctly
-     */
-    // public function testBeforeRender()
-    // {
-    //     $postId = $this->factory->post->create([
-    //         'post_type' => 'test'
-    //     ]);
-
-    //     $this
-    //         ->_controller
-    //         ->Tests
-    //             ->addPostMeta($postId, 'test_field', 'Test Value');
-    // }
 }
