@@ -8,7 +8,7 @@
 	>
 	<testsuites>
 		<testsuite name="CakePHP Test Suite">
-    		<directory suffix=".php">./tests/TestCase/</directory>
+    		<directory suffix="Test.php">./tests/TestCase/</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>
