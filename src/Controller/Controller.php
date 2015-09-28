@@ -16,7 +16,7 @@ class Controller
 {
 
     private $_postType = '';
-    protected $request = null;
+    public $request = null;
 
     /**
      * @return void
