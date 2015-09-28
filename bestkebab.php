@@ -62,12 +62,3 @@ function bestKebabInit()
 }
 
 add_action('init', 'bestKebabInit');
-
-/**
- * The Best Kebab function
- */
-function bestKebab()
-{
-    global $post;
-    BestKebab\Utility\ControllerContainer::instance()->getController($post->post_type)->beforeRender($post);
-}
